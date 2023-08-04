@@ -1,5 +1,5 @@
 import SearchBar from './components/SearchBar/SearchBar';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getPhotosByQuery } from './Api/Api';
 import ImageGallery from './components/ImageGallery/ImageGallery';
 import Button from './components/Button/Button';
@@ -15,21 +15,38 @@ export const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [largeImageUrl, setLargeImageUrl] = useState('');
 
-  const fetchImages = async () => {
-    setIsLoading(true);
+  const fetchImages = useCallback(
+    async pageNumber => {
+      setIsLoading(true);
 
-    const photos = await getPhotosByQuery(searchQuery, page);
+      const photos = await getPhotosByQuery(searchQuery, pageNumber);
 
-    setImages(prevImages => [...prevImages, ...photos.hits]);
-    setIsLoading(false);
-    setPage(prevPage => prevPage + 1);
-  };
+      setImages(prevImages => [...prevImages, ...photos.hits]);
+      setIsLoading(false);
+    },
+    [searchQuery]
+  );
 
+  // Fetch the initial images when searchQuery changes
   useEffect(() => {
+    setPage(1);
+    setImages([]);
     if (searchQuery !== '') {
-      fetchImages();
+      fetchImages(1);
     }
-  }, [searchQuery]);
+  }, [searchQuery, fetchImages]);
+
+  // Load more images on button click
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    fetchImages(nextPage);
+    setPage(nextPage);
+  };
+  // useEffect(() => {
+  //   if (searchQuery !== '') {
+  //     fetchImages();
+  //   }
+  // }, [searchQuery, fetchImages]);
 
   const onSubmit = query => {
     setSearchQuery(query);
@@ -55,7 +72,7 @@ export const App = () => {
         <Modal onClose={toggleModal} largeImageUrl={largeImageUrl} />
       )}
       {images.length > 0 && (
-        <Button isVisible={!isLoading} onClick={fetchImages} />
+        <Button isVisible={!isLoading} onClick={handleLoadMore} />
       )}
       {isLoading && (
         <div
