@@ -1,5 +1,5 @@
 import SearchBar from './components/SearchBar/SearchBar';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getPhotosByQuery } from './Api/Api';
 import ImageGallery from './components/ImageGallery/ImageGallery';
 import Button from './components/Button/Button';
