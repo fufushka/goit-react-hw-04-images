@@ -27,7 +27,6 @@ export const App = () => {
     [searchQuery]
   );
 
-  // Fetch the initial images when searchQuery changes
   useEffect(() => {
     setPage(1);
     setImages([]);
@@ -36,11 +35,16 @@ export const App = () => {
     }
   }, [searchQuery, fetchImages]);
 
-  // Load more images on button click
+  useEffect(() => {
+    if (page === 1) return;
+    fetchImages(page);
+  }, [page, fetchImages]);
+
   const handleLoadMore = () => {
     const nextPage = page + 1;
-    fetchImages(nextPage);
+
     setPage(nextPage);
+    console.log(page);
   };
   // useEffect(() => {
   //   if (searchQuery !== '') {
